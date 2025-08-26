@@ -1,0 +1,28 @@
+# Core data science
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+
+# Forecasting
+prophet
+
+# Machine learning
+xgboost
+lightgbm
+
+# Deep learning
+tensorflow
+torch
+torchvision
+torchaudio
+
+# Backend API
+fastapi
+uvicorn
+pydantic
+
+# Utilities
+joblib
+tqdm
