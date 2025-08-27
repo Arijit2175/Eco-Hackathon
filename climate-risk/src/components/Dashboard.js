@@ -8,6 +8,7 @@ import ActionPlanModal from "./ActionPlanModal";
 import { getClimateData } from "../api/climateService";
 import { generateActionPlanWithGemini } from "../api/geminiService";
 import { predictRisk } from "../logic/riskPredictor";
+import { SparklesIcon, FloodIcon, HeatwaveIcon, PollutionIcon, DroughtIcon } from "../assets/icons";
 
 const Dashboard = () => {
 
