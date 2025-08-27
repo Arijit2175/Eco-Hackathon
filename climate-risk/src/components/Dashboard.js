@@ -1,6 +1,10 @@
-import React from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import RiskCard from "./RiskCard";
+import DataChart from "./DataChart";
+import DisasterTips from "./DisasterTips";
+import ActionPlanModal from "./ActionPlanModal";
 
 const Dashboard = () => {
 
