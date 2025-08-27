@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const getClimateData = async ({ city, lat, lon }) => {
 
-  const OPENWEATHER_API_KEY = '85e8b5f56fb076d04aa7c15f1fc0733d';
+  const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
 
   let latitude = lat, longitude = lon, cityName = city;
 
