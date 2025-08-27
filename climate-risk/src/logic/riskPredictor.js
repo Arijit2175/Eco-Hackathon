@@ -27,3 +27,5 @@ const predictRisk = (weatherData) => {
   return { flood: { level: floodRisk, details: `Rainfall: ${rain ? rain['1h'] : 0} mm/h` }, heatwave: { level: heatwaveRisk, details: `Temp: ${main.temp}°C` }, pollution: { level: pollutionRisk, details: `AQI Level: ${aqi}` }, drought: { level: droughtRisk, details: `Humidity: ${main.humidity}%` } };
 
 };
+
+export { predictRisk };
