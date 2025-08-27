@@ -8,3 +8,5 @@ const RiskCard = ({ icon, title, risk, details }) => {
 
   return <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className={`risk-card ${riskClass[risk]}`}><div className="risk-card-header"><h3>{title}</h3>{icon}</div><div className="risk-card-body"><p>{risk}</p><p>{details}</p></div></motion.div>;
 };
+
+export default RiskCard;
