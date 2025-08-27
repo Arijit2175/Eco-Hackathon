@@ -51,3 +51,5 @@ const getClimateData = async ({ city, lat, lon }) => {
   } catch (error) { console.error("API Fetch Error:", error.message); throw error; }
 
 };
+
+export { getClimateData };

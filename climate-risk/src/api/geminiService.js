@@ -27,3 +27,5 @@ const generateActionPlanWithGemini = async (city, riskLevels) => {
   } catch (error) { console.error("Gemini API Error:", error); return "Could not generate an action plan at this time."; }
 
 };
+
+export { generateActionPlanWithGemini };
