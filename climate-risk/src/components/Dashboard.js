@@ -5,7 +5,9 @@ import RiskCard from "./RiskCard";
 import DataChart from "./DataChart";
 import DisasterTips from "./DisasterTips";
 import ActionPlanModal from "./ActionPlanModal";
-import { getClimateData, predictRisk, generateActionPlanWithGemini } from "../utils/api"; 
+import { getClimateData } from "../api/climateService";
+import { generateActionPlanWithGemini } from "../api/geminiService";
+import { predictRisk } from "../logic/riskPredictor";
 
 const Dashboard = () => {
 
