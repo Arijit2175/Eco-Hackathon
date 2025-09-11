@@ -17,7 +17,15 @@ def root():
 @app.post("/predict")
 def predict_weather(data: WeatherRequest):
     df = pd.DataFrame([data.features])
+
+    rename_map = {
+        "pressure_hpa": "pressure",
+        "wind_speed_kph": "wind_speed"
+    }
+    df.rename(columns=rename_map, inplace=True)
+
     df["temp_humidity_index"] = df["temperature_c"] * df["humidity"] / 100
+
     rainfall_pred = predict_rainfall_rf(df)
 
     temp_pred = predict_temperature_lstm(data.sequence)
