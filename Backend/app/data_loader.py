@@ -5,14 +5,16 @@ from datetime import datetime
 from app.config import OPENWEATHER_API_KEY, ONECALL_URL, AIR_POLLUTION_URL
 
 RAW_PATH = os.path.join("data", "raw")
+PROCESSED_PATH = os.path.join("data", "processed")
+
 os.makedirs(RAW_PATH, exist_ok=True)
+os.makedirs(PROCESSED_PATH, exist_ok=True)
 
 def fetch_weather_data(lat: float, lon: float, days: int = 7):
     """
     Fetch weather + pollution data for given coordinates.
     Uses OpenWeather OneCall + Air Pollution API.
     """
-
     params = {
         "lat": lat,
         "lon": lon,
@@ -21,6 +23,7 @@ def fetch_weather_data(lat: float, lon: float, days: int = 7):
         "units": "metric"
     }
     res = requests.get(ONECALL_URL, params=params)
+    res.raise_for_status()
     weather_json = res.json()
 
     records = []
@@ -29,7 +32,7 @@ def fetch_weather_data(lat: float, lon: float, days: int = 7):
         temp = day["temp"]["day"]
         humidity = day["humidity"]
         wind = day["wind_speed"]
-        rainfall = day.get("rain", 0) 
+        rainfall = day.get("rain", 0)
         pressure = day["pressure"]
 
         records.append({
@@ -47,6 +50,7 @@ def fetch_weather_data(lat: float, lon: float, days: int = 7):
         "appid": OPENWEATHER_API_KEY,
     }
     res_poll = requests.get(AIR_POLLUTION_URL, params=params_pollution)
+    res_poll.raise_for_status()
     pollution_json = res_poll.json()
     aqi = pollution_json["list"][0]["main"]["aqi"] if "list" in pollution_json else None
 
@@ -55,7 +59,7 @@ def fetch_weather_data(lat: float, lon: float, days: int = 7):
 
     df = pd.DataFrame(records)
 
-    file = os.path.join(RAW_PATH, "climate_data.csv")
-    df.to_csv(file, index=False)
+    raw_file = os.path.join(RAW_PATH, "climate_data.csv")
+    df.to_csv(raw_file, index=False)
 
     return df
