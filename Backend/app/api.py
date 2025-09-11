@@ -16,6 +16,9 @@ def root():
 
 @app.post("/predict")
 def predict_weather(data: WeatherRequest):
+    features = data.features.copy()
+    features["pressure"] = features.pop("pressure_hpa", None)
+    features["wind_speed"] = features.pop("wind_speed_kph", None)
     df = pd.DataFrame([data.features])
     df["temp_humidity_index"] = df["temperature_c"] * df["humidity"] / 100
     
