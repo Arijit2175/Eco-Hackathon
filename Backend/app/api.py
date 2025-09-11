@@ -21,7 +21,8 @@ def predict_weather(data: WeatherRequest):
     features["wind_speed"] = features.pop("wind_speed_kph", None)
     df = pd.DataFrame([features])
     df["temp_humidity_index"] = df["temperature_c"] * df["humidity"] / 100
-    df = df[predict_rainfall_rf.model.feature_names_in_]
+    model = predict_rainfall_rf.model  
+    df = df[model.feature_names_in_] 
     
     rainfall_pred = predict_rainfall_rf(df)[0]        
     temperature_pred = predict_temperature_lstm(data.temperature_sequence)  
