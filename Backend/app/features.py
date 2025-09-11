@@ -1,27 +1,18 @@
 import os
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
 from app.data_loader import RAW_PATH, PROCESSED_PATH
 
 def preprocess_data():
-    file = os.path.join(RAW_PATH, "climate_data.csv")
-    df = pd.read_csv(file, parse_dates=["date"])
+    raw_file = os.path.join(RAW_PATH, "climate_data.csv")
+    df = pd.read_csv(raw_file)
 
-    df = df.fillna(method="ffill").fillna(method="bfill")
+    df = df.ffill().bfill()
 
-    scaler = StandardScaler()
-    df[["rainfall_mm", "temperature_c", "pollution_aqi"]] = scaler.fit_transform(
-        df[["rainfall_mm", "temperature_c", "pollution_aqi"]]
-    )
+    df["temp_humidity_index"] = df["temperature_c"] * df["humidity"] / 100
 
-    for lag in range(1, 4):
-        df[f"rainfall_lag{lag}"] = df["rainfall_mm"].shift(lag)
-        df[f"temp_lag{lag}"] = df["temperature_c"].shift(lag)
-        df[f"pollution_lag{lag}"] = df["pollution_aqi"].shift(lag)
+    df = df[["rainfall_mm", "temperature_c", "humidity", "wind_speed", "pressure", "temp_humidity_index"]]
 
-    df = df.dropna()
-
-    processed_file = os.path.join(PROCESSED_PATH, "climate_data.csv")
+    processed_file = os.path.join(PROCESSED_PATH, "climate_data_processed.csv")
     df.to_csv(processed_file, index=False)
 
     return df
