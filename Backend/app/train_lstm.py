@@ -34,3 +34,5 @@ def train_lstm(seq_len=5):
 
     print("✅ LSTM model trained and saved.")
 
+if __name__ == "__main__":
+    train_lstm()
