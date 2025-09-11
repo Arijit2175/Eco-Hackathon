@@ -21,3 +21,5 @@ def train_random_forest():
 
     print("✅ Random Forest model trained and saved.")
 
+if __name__ == "__main__":
+    train_random_forest()
