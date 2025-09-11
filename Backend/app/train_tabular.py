@@ -9,7 +9,7 @@ def train_random_forest():
     df = pd.read_csv(PROCESSED_PATH)
 
     X = df[["temperature_c", "humidity", "wind_speed", "pressure", "temp_humidity_index"]]
-    y = df["rain"]
+    y = df["rainfall_mm"]
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
