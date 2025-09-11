@@ -6,6 +6,8 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 from app.config import MODEL_DIR
 
+rainfall_rf_model = joblib.load(os.path.join(MODEL_DIR, "rainfall_rf.pkl"))
+
 def load_random_forest():
     return joblib.load(os.path.join(MODEL_DIR, "rainfall_rf.pkl"))
 
@@ -17,8 +19,12 @@ def load_lstm():
     )
 
 def predict_rainfall_rf(features: pd.DataFrame):
-    model = load_random_forest()
-    return model.predict(features)
+      """
+    Predict rainfall using the preloaded Random Forest model.
+    Features must match the order the model was trained on.
+    """
+      features = features[rainfall_rf_model.feature_names_in_]
+      return rainfall_rf_model.predict(features)
 
 def predict_temperature_lstm(sequence):
     """Predict temperature using trained LSTM model."""
