@@ -9,4 +9,9 @@ def preprocess_data():
 
     df = df.fillna(method="ffill").fillna(method="bfill")
 
+    scaler = StandardScaler()
+    df[["rainfall_mm", "temperature_c", "pollution_aqi"]] = scaler.fit_transform(
+        df[["rainfall_mm", "temperature_c", "pollution_aqi"]]
+    )
+
     
