@@ -18,7 +18,7 @@ class RainfallFeatures(BaseModel):
 
 class WeatherRequest(BaseModel):
     rainfall_features: RainfallFeatures
-    temperature_sequence: conlist(float, min_items=1)  
+    temperature_sequence: conlist(float, min_length=1)  
 
 @app.get("/")
 def root():
