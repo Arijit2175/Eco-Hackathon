@@ -14,4 +14,14 @@ def preprocess_data():
         df[["rainfall_mm", "temperature_c", "pollution_aqi"]]
     )
 
-    
+    for lag in range(1, 4):
+        df[f"rainfall_lag{lag}"] = df["rainfall_mm"].shift(lag)
+        df[f"temp_lag{lag}"] = df["temperature_c"].shift(lag)
+        df[f"pollution_lag{lag}"] = df["pollution_aqi"].shift(lag)
+
+    df = df.dropna()
+
+    processed_file = os.path.join(PROCESSED_PATH, "climate_data.csv")
+    df.to_csv(processed_file, index=False)
+
+    return df
