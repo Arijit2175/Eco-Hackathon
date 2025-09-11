@@ -19,6 +19,7 @@ def root():
 @app.post("/predict/rainfall_rf")
 def predict_rainfall(data: RainfallRequest):
     df = pd.DataFrame([data.features])
+    df["temp_humidity_index"] = df["temperature_c"] * df["humidity"] / 100
     pred = predict_rainfall_rf(df)
     return {"predicted_rainfall_mm": float(pred[0])}
 
