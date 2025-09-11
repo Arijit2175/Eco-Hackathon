@@ -27,3 +27,5 @@ def predict_temperature(data: TemperatureRequest):
     pred = predict_temperature_lstm(data.sequence)
     return {"predicted_temperature_c": pred}
 
+if __name__ == "__main__":
+    uvicorn.run("app.api:app", host="0.0.0.0", port=8000, reload=True)
