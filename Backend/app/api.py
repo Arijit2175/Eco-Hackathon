@@ -22,3 +22,8 @@ def predict_rainfall(data: RainfallRequest):
     pred = predict_rainfall_rf(df)
     return {"predicted_rainfall_mm": float(pred[0])}
 
+@app.post("/predict/temperature_lstm")
+def predict_temperature(data: TemperatureRequest):
+    pred = predict_temperature_lstm(data.sequence)
+    return {"predicted_temperature_c": pred}
+
