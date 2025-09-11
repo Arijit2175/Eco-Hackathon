@@ -16,3 +16,9 @@ class TemperatureRequest(BaseModel):
 def root():
     return {"message": "🌍 Eco Hackathon Weather API is running!"}
 
+@app.post("/predict/rainfall_rf")
+def predict_rainfall(data: RainfallRequest):
+    df = pd.DataFrame([data.features])
+    pred = predict_rainfall_rf(df)
+    return {"predicted_rainfall_mm": float(pred[0])}
+
