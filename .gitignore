@@ -62,4 +62,4 @@ dmypy.json
 Thumbs.db
 
 # Python files
-app/config.py
+Backend/app/config.py
