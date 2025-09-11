@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import logging
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field, conlist
+from pydantic import conlist
 from app.models import predict_rainfall_rf, predict_temperature_lstm
 
 logging.basicConfig(level=logging.INFO)
