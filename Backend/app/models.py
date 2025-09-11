@@ -8,3 +8,6 @@ from app.config import MODEL_DIR, PROCESSED_PATH
 def load_random_forest():
     return joblib.load(os.path.join(MODEL_DIR, "rainfall_rf.pkl"))
 
+def load_lstm():
+    return tf.keras.models.load_model(os.path.join(MODEL_DIR, "rainfall_lstm.h5"))
+
