@@ -1,52 +1,61 @@
 import os
+import requests
 import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime
+from app.config import OPENWEATHER_API_KEY, ONECALL_URL, AIR_POLLUTION_URL
 
 RAW_PATH = os.path.join("data", "raw")
-PROCESSED_PATH = os.path.join("data", "processed")
-
 os.makedirs(RAW_PATH, exist_ok=True)
-os.makedirs(PROCESSED_PATH, exist_ok=True)
 
-def generate_synthetic_climate_data(days: int = 365):
+def fetch_weather_data(lat: float, lon: float, days: int = 7):
     """
-    Generate synthetic climate data:
-    - rainfall (mm)
-    - temperature (°C)
-    - pollution (AQI)
-    - flood_risk (0/1)
+    Fetch weather + pollution data for given coordinates.
+    Uses OpenWeather OneCall + Air Pollution API.
     """
-    start_date = datetime.today() - timedelta(days=days)
-    dates = [start_date + timedelta(days=i) for i in range(days)]
 
-    rainfall = np.random.gamma(2, 5, days)  
-    temperature = np.random.normal(30, 5, days)  
-    pollution = np.random.normal(100, 30, days)
+    params = {
+        "lat": lat,
+        "lon": lon,
+        "exclude": "minutely,hourly,alerts",
+        "appid": OPENWEATHER_API_KEY,
+        "units": "metric"
+    }
+    res = requests.get(ONECALL_URL, params=params)
+    weather_json = res.json()
 
-    flood_risk = ((rainfall > 15) & (pollution > 120)).astype(int)
+    records = []
+    for day in weather_json.get("daily", []):
+        date = datetime.fromtimestamp(day["dt"]).strftime("%Y-%m-%d")
+        temp = day["temp"]["day"]
+        humidity = day["humidity"]
+        wind = day["wind_speed"]
+        rainfall = day.get("rain", 0) 
+        pressure = day["pressure"]
 
-    df = pd.DataFrame({
-        "date": dates,
-        "rainfall_mm": rainfall,
-        "temperature_c": temperature,
-        "pollution_aqi": pollution,
-        "flood_risk": flood_risk
-    })
+        records.append({
+            "date": date,
+            "temperature_c": temp,
+            "humidity": humidity,
+            "wind_speed": wind,
+            "rainfall_mm": rainfall,
+            "pressure": pressure,
+        })
 
-    raw_file = os.path.join(RAW_PATH, "climate_data.csv")
-    df.to_csv(raw_file, index=False)
+    params_pollution = {
+        "lat": lat,
+        "lon": lon,
+        "appid": OPENWEATHER_API_KEY,
+    }
+    res_poll = requests.get(AIR_POLLUTION_URL, params=params_pollution)
+    pollution_json = res_poll.json()
+    aqi = pollution_json["list"][0]["main"]["aqi"] if "list" in pollution_json else None
+
+    for rec in records:
+        rec["pollution_aqi"] = aqi
+
+    df = pd.DataFrame(records)
+
+    file = os.path.join(RAW_PATH, "climate_data.csv")
+    df.to_csv(file, index=False)
 
     return df
-
-def load_data(processed: bool = False):
-    """
-    Load data from raw or processed folder.
-    """
-    path = PROCESSED_PATH if processed else RAW_PATH
-    file = os.path.join(path, "climate_data.csv")
-
-    if not os.path.exists(file):
-        raise FileNotFoundError("Dataset not found. Run generate_synthetic_climate_data() first.")
-
-    return pd.read_csv(file, parse_dates=["date"])
