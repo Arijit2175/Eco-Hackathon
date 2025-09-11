@@ -1,38 +1,64 @@
+# app/train_lstm.py
 import os
 import numpy as np
 import pandas as pd
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense
-from tensorflow.keras.optimizers import Adam
 from sklearn.preprocessing import MinMaxScaler
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense, Dropout
+from tensorflow.keras.callbacks import EarlyStopping
 from app.config import PROCESSED_PATH, MODEL_DIR
 
-def train_lstm(seq_len=5):
-    df = pd.read_csv(PROCESSED_PATH)
-    features = ["temperature_c", "humidity", "wind_speed", "pressure", "temp_humidity_index"]
-    target = "rain"
+SEQ_LEN = 5  
+
+def create_sequences(data, seq_len=SEQ_LEN):
+    X, y = [], []
+    for i in range(len(data) - seq_len):
+        X.append(data[i:i+seq_len])
+        y.append(data[i+seq_len])
+    return np.array(X), np.array(y)
+
+def train_lstm_temperature():
+    file_path = PROCESSED_PATH
+    df = pd.read_csv(file_path)
+
+    values = df["temperature_c"].values.reshape(-1, 1)
 
     scaler = MinMaxScaler()
-    X_scaled = scaler.fit_transform(df[features])
-    y = df[target].values
+    scaled = scaler.fit_transform(values)
 
-    X_seq, y_seq = [], []
-    for i in range(len(X_scaled) - seq_len):
-        X_seq.append(X_scaled[i:i+seq_len])
-        y_seq.append(y[i+seq_len])
-    X_seq, y_seq = np.array(X_seq), np.array(y_seq)
+    X, y = create_sequences(scaled, SEQ_LEN)
+
+    X = X.reshape((X.shape[0], X.shape[1], 1))
+
+    split = int(0.8 * len(X))
+    X_train, X_test = X[:split], X[split:]
+    y_train, y_test = y[:split], y[split:]
 
     model = Sequential([
-        LSTM(64, input_shape=(seq_len, len(features))),
+        LSTM(64, return_sequences=True, input_shape=(SEQ_LEN, 1)),
+        Dropout(0.2),
+        LSTM(32),
         Dense(1)
     ])
-    model.compile(optimizer=Adam(0.001), loss="mse")
-    model.fit(X_seq, y_seq, epochs=10, batch_size=16, verbose=1)
+
+    model.compile(optimizer="adam", loss="mse")
+
+    es = EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True)
+    model.fit(
+        X_train, y_train,
+        validation_data=(X_test, y_test),
+        epochs=50,
+        batch_size=16,
+        callbacks=[es],
+        verbose=1
+    )
 
     os.makedirs(MODEL_DIR, exist_ok=True)
-    model.save(os.path.join(MODEL_DIR, "rainfall_lstm.h5"))
+    model.save(os.path.join(MODEL_DIR, "temperature_lstm.h5"))
+    import joblib
+    joblib.dump(scaler, os.path.join(MODEL_DIR, "temperature_scaler.pkl"))
 
     print("✅ LSTM model trained and saved.")
 
 if __name__ == "__main__":
-    train_lstm()
+    train_lstm_temperature()
