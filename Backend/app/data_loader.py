@@ -20,4 +20,6 @@ def generate_synthetic_climate_data(days: int = 365):
     start_date = datetime.today() - timedelta(days=days)
     dates = [start_date + timedelta(days=i) for i in range(days)]
 
-    
+    rainfall = np.random.gamma(2, 5, days)  
+    temperature = np.random.normal(30, 5, days)  
+    pollution = np.random.normal(100, 30, days)
