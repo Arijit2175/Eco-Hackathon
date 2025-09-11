@@ -7,4 +7,6 @@ def preprocess_data():
     file = os.path.join(RAW_PATH, "climate_data.csv")
     df = pd.read_csv(file, parse_dates=["date"])
 
+    df = df.fillna(method="ffill").fillna(method="bfill")
+
     
