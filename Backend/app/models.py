@@ -9,8 +9,12 @@ from app.config import MODEL_DIR
 def load_random_forest():
     return joblib.load(os.path.join(MODEL_DIR, "rainfall_rf.pkl"))
 
+
 def load_lstm():
-    return tf.keras.models.load_model(os.path.join(MODEL_DIR, "rainfall_lstm.h5"))
+    return tf.keras.models.load_model(
+        os.path.join(MODEL_DIR, "rainfall_lstm.h5"),
+        compile=False  
+    )
 
 def predict_rainfall_rf(features: pd.DataFrame):
     model = load_random_forest()
@@ -23,8 +27,10 @@ def predict_temperature_lstm(sequence):
 
     if not os.path.exists(model_path):
         raise FileNotFoundError("LSTM model not found, train it first with train_lstm.py")
+    if not os.path.exists(scaler_path):
+        raise FileNotFoundError("Scaler not found, make sure training saved it.")
 
-    model = load_model(model_path)
+    model = load_model(model_path, compile=False)
     scaler = joblib.load(scaler_path)
 
     seq_scaled = scaler.transform(np.array(sequence).reshape(-1, 1))
@@ -32,4 +38,5 @@ def predict_temperature_lstm(sequence):
 
     pred_scaled = model.predict(seq_scaled)
     pred = scaler.inverse_transform(pred_scaled)
+
     return float(pred[0][0])
