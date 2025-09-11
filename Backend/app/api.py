@@ -17,18 +17,14 @@ def root():
 @app.post("/predict")
 def predict_weather(data: WeatherRequest):
     features = data.features.copy()
-    
     features["pressure"] = features.pop("pressure_hpa", None)
     features["wind_speed"] = features.pop("wind_speed_kph", None)
-    
+
     df = pd.DataFrame([features])
     df["temp_humidity_index"] = df["temperature_c"] * df["humidity"] / 100
 
-    df = df[rainfall_rf_model.feature_names_in_]
-    rainfall_pred = rainfall_rf_model.predict(df)[0]
-    
-    rainfall_pred = predict_rainfall_rf(df)[0]        
-    temperature_pred = predict_temperature_lstm(data.temperature_sequence)  
+    rainfall_pred = predict_rainfall_rf(df)[0]
+    temperature_pred = predict_temperature_lstm(data.temperature_sequence)
 
     flood_risk = "Low"
     if rainfall_pred > 100:
