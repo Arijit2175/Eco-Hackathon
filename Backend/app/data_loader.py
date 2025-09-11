@@ -23,3 +23,7 @@ def generate_synthetic_climate_data(days: int = 365):
     rainfall = np.random.gamma(2, 5, days)  
     temperature = np.random.normal(30, 5, days)  
     pollution = np.random.normal(100, 30, days)
+
+    flood_risk = ((rainfall > 15) & (pollution > 120)).astype(int)
+
+    
