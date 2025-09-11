@@ -12,3 +12,7 @@ class RainfallRequest(BaseModel):
 class TemperatureRequest(BaseModel):
     sequence: list  
 
+@app.get("/")
+def root():
+    return {"message": "🌍 Eco Hackathon Weather API is running!"}
+
