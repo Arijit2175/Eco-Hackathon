@@ -8,26 +8,18 @@ from app.config import MODEL_DIR
 
 rainfall_rf_model = joblib.load(os.path.join(MODEL_DIR, "rainfall_rf.pkl"))
 
-def load_random_forest():
-    return joblib.load(os.path.join(MODEL_DIR, "rainfall_rf.pkl"))
-
-
-def load_lstm():
-    return tf.keras.models.load_model(
-        os.path.join(MODEL_DIR, "rainfall_lstm.h5"),
-        compile=False  
-    )
-
 def predict_rainfall_rf(features: pd.DataFrame):
-      """
+    """
     Predict rainfall using the preloaded Random Forest model.
     Features must match the order the model was trained on.
     """
-      features = features[rainfall_rf_model.feature_names_in_]
-      return rainfall_rf_model.predict(features)
+    features = features[rainfall_rf_model.feature_names_in_]
+    return rainfall_rf_model.predict(features)
 
 def predict_temperature_lstm(sequence):
-    """Predict temperature using trained LSTM model."""
+    """
+    Predict temperature using trained LSTM model.
+    """
     model_path = os.path.join(MODEL_DIR, "temperature_lstm.h5")
     scaler_path = os.path.join(MODEL_DIR, "temperature_scaler.pkl")
 
