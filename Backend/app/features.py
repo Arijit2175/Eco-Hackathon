@@ -24,3 +24,7 @@ def preprocess_data():
 
     return df
 
+if __name__ == "__main__":
+    df = preprocess_data()
+    print("✅ Preprocessing complete. Processed data saved.")
+    print(df.head())
