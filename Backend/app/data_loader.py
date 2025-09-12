@@ -10,45 +10,50 @@ PROCESSED_PATH = os.path.join("data", "processed")
 os.makedirs(RAW_PATH, exist_ok=True)
 os.makedirs(PROCESSED_PATH, exist_ok=True)
 
-def fetch_weather_data(lat: float, lon: float, city: str = None):
-    """Fetch last 5 days of hourly weather data for a single city."""
-    base_url = "https://api.openweathermap.org/data/2.5/onecall/timemachine"
-    all_records = []
+def fetch_weather_data(lat: float, lon: float, city: str):
+    forecast_url = "https://api.openweathermap.org/data/2.5/forecast"
+    current_url = "https://api.openweathermap.org/data/2.5/weather"
 
-    for days_back in range(1, 6):
-        dt = int((datetime.utcnow() - timedelta(days=days_back)).timestamp())
-        params = {
-            "lat": lat,
-            "lon": lon,
-            "dt": dt,
-            "appid": OPENWEATHER_API_KEY,
-            "units": "metric"
-        }
+    params = {"lat": lat, "lon": lon, "appid": OPENWEATHER_API_KEY, "units": "metric"}
 
-        res = requests.get(base_url, params=params)
-        res.raise_for_status()
-        data = res.json()
+    res_current = requests.get(current_url, params=params)
+    res_current.raise_for_status()
+    current_json = res_current.json()
 
-        for hour in data.get("hourly", []):
-            date = datetime.fromtimestamp(hour["dt"]).strftime("%Y-%m-%d %H:%M:%S")
-            temp = hour.get("temp")
-            humidity = hour.get("humidity")
-            pressure = hour.get("pressure")
-            wind_speed = hour.get("wind_speed")
-            rain = hour.get("rain", {}).get("1h", 0)
+    res_forecast = requests.get(forecast_url, params=params)
+    res_forecast.raise_for_status()
+    forecast_json = res_forecast.json()
 
-            all_records.append({
-                "city": city if city else f"{lat},{lon}",
-                "date": date,
-                "temperature_c": temp,
-                "humidity": humidity,
-                "wind_speed": wind_speed,
-                "rainfall_mm": rain,
-                "pressure": pressure,
-            })
+    records = []
 
-    return pd.DataFrame(all_records)
+    main = current_json["main"]
+    wind = current_json.get("wind", {})
+    rain = current_json.get("rain", {}).get("1h", 0)
+    records.append({
+        "city": city,
+        "date": datetime.utcfromtimestamp(current_json["dt"]).strftime("%Y-%m-%d %H:%M:%S"),
+        "temperature_c": main.get("temp"),
+        "humidity": main.get("humidity"),
+        "wind_speed": wind.get("speed"),
+        "pressure": main.get("pressure"),
+        "rainfall_mm": rain,
+    })
 
+    for entry in forecast_json.get("list", []):
+        main = entry["main"]
+        wind = entry.get("wind", {})
+        rain = entry.get("rain", {}).get("3h", 0)
+        records.append({
+            "city": city,
+            "date": datetime.utcfromtimestamp(entry["dt"]).strftime("%Y-%m-%d %H:%M:%S"),
+            "temperature_c": main.get("temp"),
+            "humidity": main.get("humidity"),
+            "wind_speed": wind.get("speed"),
+            "pressure": main.get("pressure"),
+            "rainfall_mm": rain,
+        })
+
+    return pd.DataFrame(records)
 
 def fetch_multiple_cities():
     """Ask user for city inputs and fetch data for each."""
