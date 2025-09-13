@@ -2,9 +2,18 @@ import uvicorn
 import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel, conlist
+from fastapi.middleware.cors import CORSMiddleware  
 from app.models import predict_rainfall_rf, predict_temperature_lstm
 
 app = FastAPI(title="🌍 Eco Hackathon Weather API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://127.0.0.1:5173", "http://localhost:5173"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class WeatherRequest(BaseModel):
     features: dict              
